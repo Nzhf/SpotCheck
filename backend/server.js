@@ -43,6 +43,17 @@ app.use(express.json());
 
 console.log('3. Middleware configured (CORS + JSON parser)');
 
+// Root Route - provide a friendly landing page for the root URL
+app.get('/', (req, res) => {
+    res.send(`
+        <div style="font-family: sans-serif; padding: 2rem; text-align: center;">
+            <h1 style="color: #3B82F6;">SpotCheck API</h1>
+            <p>The backend server is running successfully.</p>
+            <p>Go to <a href="/api/health">/api/health</a> to check system status.</p>
+        </div>
+    `);
+});
+
 // Health Check Route - defined BEFORE other routes
 // This ensures health check works even if other routes fail to load
 app.get('/api/health', (req, res) => {

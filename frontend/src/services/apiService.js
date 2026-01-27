@@ -8,8 +8,8 @@ import axios from 'axios';
 
 // Set the Backend URL dynamically
 // 1. In production (hosted), we'll set VITE_API_URL in the dashboard
-// 2. In development, it defaults to localhost:3001
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+// 2. In development, it defaults to '/api' which uses the Vite proxy
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 const api = axios.create({
     baseURL: API_BASE_URL,
