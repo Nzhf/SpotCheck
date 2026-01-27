@@ -4,7 +4,7 @@
 
 /* Custom base styles if needed, though Tailwind handles most */
 body {
-  background-color: #FFFFFF;
-  /* White background */
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: #FFFFFF;
+    /* White background */
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }

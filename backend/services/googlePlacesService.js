@@ -91,6 +91,7 @@ async function getPlaceDetails(placeId) {
         throw error;
     }
 }
+
 /**
  * Gets place suggestions as user types.
  * 
