@@ -21,6 +21,9 @@ const SearchBar = ({ onSearch, isLoading }) => {
   
   // State for loading suggestions
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
+
+  // State for highlighted suggestion index
+  const [highlightedIndex, setHighlightedIndex] = useState(0);
   
   // Reference to detect clicks outside the component
   const wrapperRef = useRef(null);
@@ -58,6 +61,13 @@ const SearchBar = ({ onSearch, isLoading }) => {
   }, [query]);
 
   /**
+   * Reset highlighted index to 0 when suggestions list changes.
+   */
+  useEffect(() => {
+    setHighlightedIndex(0);
+  }, [suggestions]);
+
+  /**
    * Close suggestions dropdown when clicking outside
    */
   useEffect(() => {
@@ -68,17 +78,74 @@ const SearchBar = ({ onSearch, isLoading }) => {
     };
 
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
   }, []);
 
   /**
    * Handle form submission (pressing Enter or clicking Search button)
    */
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (query.trim() && !isLoading) {
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    if (isLoading) {
+      return;
+    }
+
+    // If suggestions are visible and there's a highlighted index, search that suggestion
+    const hasSuggestions = showSuggestions && suggestions.length > 0;
+    const isValidIndex = highlightedIndex >= 0 && highlightedIndex < suggestions.length;
+    
+    if (hasSuggestions && isValidIndex) {
+      const selectedSuggestion = suggestions[highlightedIndex];
+      setQuery(selectedSuggestion.mainText);
+      setShowSuggestions(false);
+      onSearch(selectedSuggestion.mainText);
+    } else if (query.trim()) {
       setShowSuggestions(false);
       onSearch(query.trim());
+    }
+  };
+
+  /**
+   * Handle keyboard navigation within the suggestions list
+   */
+  const handleKeyDown = (event) => {
+    if (!showSuggestions || suggestions.length === 0) {
+      return;
+    }
+
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      setHighlightedIndex((prevIndex) => {
+        if (prevIndex === suggestions.length - 1) {
+          return 0;
+        }
+        return prevIndex + 1;
+      });
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      setHighlightedIndex((prevIndex) => {
+        if (prevIndex === 0) {
+          return suggestions.length - 1;
+        }
+        return prevIndex - 1;
+      });
+    } else if (event.key === 'Escape') {
+      setShowSuggestions(false);
+    }
+  };
+
+  /**
+   * Handle hover highlighting only for fine pointer devices (like mice) to avoid mobile scrolling issues
+   */
+  const handleMouseEnter = (index) => {
+    const hasFinePointer = window.matchMedia('(pointer: fine)').matches;
+    if (hasFinePointer) {
+      setHighlightedIndex(index);
     }
   };
 
@@ -100,7 +167,8 @@ const SearchBar = ({ onSearch, isLoading }) => {
           <input
             type="text"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(event) => setQuery(event.target.value)}
+            onKeyDown={handleKeyDown}
             onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
             placeholder="Enter a location (e.g., 'Starbucks Times Square')"
             disabled={isLoading}
@@ -132,7 +200,10 @@ const SearchBar = ({ onSearch, isLoading }) => {
               <li
                 key={suggestion.placeId || index}
                 onClick={() => handleSuggestionClick(suggestion)}
-                className="px-4 py-3 hover:bg-blue-50 cursor-pointer transition-colors flex items-start gap-3"
+                onMouseEnter={() => handleMouseEnter(index)}
+                className={`px-4 py-3 cursor-pointer transition-colors flex items-start gap-3 ${
+                  index === highlightedIndex ? 'bg-blue-50' : ''
+                }`}
               >
                 {/* Map pin icon */}
                 <MapPin className="w-5 h-5 text-primary-blue mt-0.5 flex-shrink-0" />
