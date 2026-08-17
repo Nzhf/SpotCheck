@@ -2,13 +2,13 @@
  * Groq AI Service
  * 
  * Handles interactions with the Groq API to summarize reviews.
- * Uses the llama-3.3-70b-versatile model to generate structured JSON summaries.
+ * Uses the qwen/qwen3.6-27b model to generate structured JSON summaries.
  */
 
 const axios = require('axios');
 
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
-const MODEL_ID = 'llama-3.3-70b-versatile';
+const MODEL_ID = 'qwen/qwen3.6-27b';
 
 /**
  * Summarizes a list of reviews using Groq AI.
