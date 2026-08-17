@@ -5,7 +5,7 @@
 ## Features
 
 - **Instant Search**: Search for any location via Google Places API.
-- **AI Summaries**: Uses Groq AI (Llama 3.3 70b) to analyze reviews.
+- **AI Summaries**: Uses Groq AI (qwen/qwen3.6-27b) to analyze reviews.
 - **Sentiment Analysis**: Clear Positive, Mixed, or Negative badge.
 - **Key Insights**: distinct Pros (Green) and Cons (Red) lists.
 - **Common Themes**: Identifies recurring topics (e.g., "Great Service", "Long Wait").
