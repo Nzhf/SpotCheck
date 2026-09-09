@@ -72,7 +72,8 @@ Rules:
                     { role: 'user', content: systemPrompt } // Using 'user' role as prompt is dynamic
                 ],
                 temperature: 0.5, // Balance creativity and consistency
-                response_format: { type: "json_object" } // Force JSON response if supported, or rely on prompt instruction
+                // Note: response_format removed - relying on prompt instruction for JSON format
+                // Some Groq models have issues with json_object validation
             },
             {
                 headers: {
@@ -85,10 +86,15 @@ Rules:
         // Parse the response
         const aiContent = response.data.choices[0].message.content;
 
-        // Parse JSON safely
+        // Parse JSON safely - clean up potential markdown code blocks
         let parsedSummary;
         try {
-            parsedSummary = JSON.parse(aiContent);
+            // Remove markdown code blocks if present (```json ... ```)
+            let cleanedContent = aiContent.trim();
+            if (cleanedContent.startsWith('```')) {
+                cleanedContent = cleanedContent.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '');
+            }
+            parsedSummary = JSON.parse(cleanedContent);
         } catch (parseError) {
             console.error('Failed to parse AI response as JSON:', aiContent);
             // Fallback object to prevent app crash
