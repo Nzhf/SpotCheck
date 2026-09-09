@@ -8,7 +8,9 @@
 const axios = require('axios');
 
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
-const MODEL_ID = 'qwen/qwen3.6-27b';
+// Using openai/gpt-oss-20b (recommended replacement for llama-3.1-8b-instant)
+// See: https://console.groq.com/docs/deprecations
+const MODEL_ID = 'openai/gpt-oss-20b';
 
 /**
  * Summarizes a list of reviews using Groq AI.
@@ -72,6 +74,7 @@ Rules:
                     { role: 'user', content: systemPrompt } // Using 'user' role as prompt is dynamic
                 ],
                 temperature: 0.5, // Balance creativity and consistency
+                max_tokens: 800, // Limit output tokens to stay within free tier rate limits
                 // Note: response_format removed - relying on prompt instruction for JSON format
                 // Some Groq models have issues with json_object validation
             },
